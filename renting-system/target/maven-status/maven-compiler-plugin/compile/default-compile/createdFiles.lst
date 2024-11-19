@@ -1,5 +1,0 @@
-room\rental\system\com\Config\config.class
-room\rental\system\com\Entity\Todo.class
-room\rental\system\com\Controller\TestController.class
-room\rental\system\com\Repository\TodoRepo.class
-room\rental\system\com\RoomRentingSystemApplication.class

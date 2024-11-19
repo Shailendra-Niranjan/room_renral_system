@@ -1,6 +1,7 @@
 package room.rental.system.com.ServiceImpl;
 
 
+import jakarta.mail.MessagingException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,8 +16,10 @@ import room.rental.system.com.Repository.UserRepository;
 import room.rental.system.com.Security.JWTService;
 import room.rental.system.com.Security.LoggedInUser;
 import room.rental.system.com.Security.UserDeatilsServices;
+import room.rental.system.com.Service.EmailService;
 import room.rental.system.com.Service.UserService;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 
 @Service
@@ -45,7 +48,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
 
-
+    @Autowired
+    EmailService emailService;
 
     @Override
     public String registerUser(UserDto userDto) {
@@ -68,7 +72,19 @@ public class UserServiceImpl implements UserService {
         else {
             users.setRole(Role.USER_ROLE);
         }
-        userRepository.save(users);
+        try {
+            emailService.userCreationMail(users.getEmail() ,"Account Created" , userDto.getPassword() ,users.getName());
+            userRepository.save(users);
+
+        } catch (IOException e) {
+            System.out.println(e);
+            return "IOException occur while sending mail";
+        } catch (MessagingException e) {
+            System.out.println(e);
+            return "MessagingException occur while sending mail";
+        }catch (Exception e){
+            return e.getLocalizedMessage();
+        }
         return "Register Successfully !";
     }
 
@@ -90,10 +106,15 @@ public class UserServiceImpl implements UserService {
       Users users = loggedInUser.getUsers();
       users.setPassword(encoder.encode(newPassword));
       userRepository.save(users);
-//      userDto.setPassword(encoder.encode(newPassword));
-//  Users users = databaseService.updateUser(userDto);
-////      usersRepo.save(users);
-//      mailService.newPasswordMail(users.getEmail() , "New Password " , newPassword , " ... ");
+        try {
+            emailService.sendResetPassword(users.getEmail() ,"Forget Password" , newPassword , users.getName());
+        } catch (IOException e) {
+            System.out.println(e);
+            return "IOException occur while sending mail";
+        } catch (MessagingException e) {
+            System.out.println(e);
+            return "MessagingException occur while sending mail";
+        }
         return "New Password sent to your email";
     }
 
