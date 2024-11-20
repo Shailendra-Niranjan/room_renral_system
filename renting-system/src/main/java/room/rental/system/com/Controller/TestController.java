@@ -97,158 +97,158 @@ public class TestController {
     }
 
 
-    @PostMapping("/upload/house")
-    public String uploadFiles(
-            @RequestParam String house,
-            @RequestParam(required = false) List<String> rooms,
-            @RequestParam(required = false) MultiValueMap<String, MultipartFile> pics
-    ) {
-
-        if(!SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains("OWNER_ROLE")){
-            return "Unauthorized for house Creation ! ";
-        }
-
-        // Process the house
-        System.out.println("House: " + house);
-        HouseDto house1 = gson.fromJson(house , HouseDto.class);
-        House existHouse = houseRepository.findHouseByHouseName(house1.getHouseName());
-        if(existHouse!=null){
-            return "This House is already exist !";
-        }
-        House newHouse = new House();
-        newHouse.setAddress(house1.getAddress());
-        newHouse.setCity(house1.getCity());
-        newHouse.setHouseName(house1.getHouseName());
-        newHouse.setContact(house1.getContact());
-        newHouse.setState(house1.getState());
-        newHouse.setPincode(house1.getPincode());
-        newHouse.setDescription(house1.getDescription());
-        List<Room> roomList = new ArrayList<>();
-        // Process the rooms
-        if (pics != null && !pics.isEmpty()) {
-            List<MultipartFile> Hpic = pics.get("HouseHeadPic");
-            List<MultipartFile> housePics = pics.get("HousePic");
-            List<String> picUrl = new ArrayList<>();
-            List<String> picUrlPublicId = new ArrayList<>();
-            if (Hpic!=null) {
-
-                Hpic.forEach(r -> {
-                    Map map1 = null;
-                    try {
-                        map1 = this.cloudinaryImageService.upload(r);
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    String url = (String) map1.get("url");
-                    String picPublicID = (String) map1.get("public_id");
-                    picUrl.add(url);
-                    picUrlPublicId.add(picPublicID);
-                });
-                if (!(picUrl.isEmpty() && picUrlPublicId.isEmpty())) {
-                    newHouse.setHouseHPic(picUrl.get(0));
-                    newHouse.setHouseHPicPublicID(picUrlPublicId.get(0));
-                }
-            }
-            if (housePics != null) {
-                picUrl.clear();
-                picUrlPublicId.clear();
-                housePics.forEach(r -> {
-                    Map map1 = null;
-                    try {
-                        map1 = this.cloudinaryImageService.upload(r);
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    String url = (String) map1.get("url");
-                    String picPublicID = (String) map1.get("public_id");
-                    picUrl.add(url);
-                    picUrlPublicId.add(picPublicID);
-                });
-                if (!(picUrl.isEmpty() && picUrlPublicId.isEmpty())) {
-                    newHouse.setPics(picUrl);
-                    newHouse.setPicsPublicID(picUrlPublicId);
-                }
-            }
-        }
-        AtomicInteger invalidRoom = new AtomicInteger();
-     House finalHouse =   houseRepository.save(newHouse);
-        if (rooms != null && !rooms.isEmpty()) {
-
-           rooms.stream().forEach(e->{
-               RoomDto room = gson.fromJson(e , RoomDto.class);
-               Room existRoom = roomRepository.findRoomByRoomNumber(room.getRoomNumber());
-               if(existRoom != null){
-                   invalidRoom.getAndIncrement();
-               }
-               Room newRoom = new Room();
-               newRoom.setRoomNumber(room.getRoomNumber());
-               newRoom.setDescription(room.getDescription());
-               newRoom.setRentPrice(room.getRentPrice());
-               newRoom.setHouseName(newHouse.getHouseName());
-
-               if (pics != null && !pics.isEmpty()) {
-                   List<MultipartFile> Hpic = pics.get("RH" + room.getRoomNumber());
-                   List<MultipartFile> roomPics = pics.get("R" + room.getRoomNumber());
-                   List<String> picUrl = new ArrayList<>();
-                   List<String> picUrlPublicId = new ArrayList<>();
-                   if (Hpic!=null) {
-
-                       Hpic.forEach(r -> {
-                           Map map1 = null;
-                           try {
-                               map1 = this.cloudinaryImageService.upload(r);
-                           } catch (IOException ex) {
-                               throw new RuntimeException(ex);
-                           }
-                           String url = (String) map1.get("url");
-                           String picPublicID = (String) map1.get("public_id");
-                           picUrl.add(url);
-                           picUrlPublicId.add(picPublicID);
-                       });
-                       if (!(picUrl.isEmpty() && picUrlPublicId.isEmpty())) {
-                           newRoom.setRoomHPic(picUrl.get(0));
-                           newRoom.setRoomHPicpublicID(picUrlPublicId.get(0));
-                       }
-                   }
-                   if (roomPics != null) {
-                       picUrl.clear();
-                       picUrlPublicId.clear();
-                       roomPics.forEach(r -> {
-                           Map map1 = null;
-                           try {
-                               map1 = this.cloudinaryImageService.upload(r);
-                           } catch (IOException ex) {
-                               throw new RuntimeException(ex);
-                           }
-                           String url = (String) map1.get("url");
-                           String picPublicID = (String) map1.get("public_id");
-                           picUrl.add(url);
-                           picUrlPublicId.add(picPublicID);
-                       });
-                   if (!(picUrl.isEmpty() && picUrlPublicId.isEmpty())) {
-                       newRoom.setRoomPics(picUrl);
-                       newRoom.setRoomPicsPublicID(picUrlPublicId);
-                   }
-                   }
-               }
-               newRoom.setHouse(finalHouse);
-               roomList.add(newRoom);
-           });
-        } else {
-            System.out.println("No rooms provided.");
-        }
-
-
-       List<Room> newRooms = roomRepository.saveAll(roomList);
-
-        if(invalidRoom.get()>0){
-            return "House are added Successfully But some rooms are remove because room number is alread exist ";
-        }
-        return "Upload successful!";
-    }
-
-    @GetMapping("/getAllRooms")
-    public List<House> getAllhouse(){
-        return houseRepository.findAll();
-    }
+//    @PostMapping("/upload/house")
+//    public String uploadFiles(
+//            @RequestParam String house,
+//            @RequestParam(required = false) List<String> rooms,
+//            @RequestParam(required = false) MultiValueMap<String, MultipartFile> pics
+//    ) {
+//
+//        if(!SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains("OWNER_ROLE")){
+//            return "Unauthorized for house Creation ! ";
+//        }
+//
+//        // Process the house
+//        System.out.println("House: " + house);
+//        HouseDto house1 = gson.fromJson(house , HouseDto.class);
+//        House existHouse = houseRepository.findHouseByHouseName(house1.getHouseName());
+//        if(existHouse!=null){
+//            return "This House is already exist !";
+//        }
+//        House newHouse = new House();
+//        newHouse.setAddress(house1.getAddress());
+//        newHouse.setCity(house1.getCity());
+//        newHouse.setHouseName(house1.getHouseName());
+//        newHouse.setContact(house1.getContact());
+//        newHouse.setState(house1.getState());
+//        newHouse.setPincode(house1.getPincode());
+//        newHouse.setDescription(house1.getDescription());
+//        List<Room> roomList = new ArrayList<>();
+//        // Process the rooms
+//        if (pics != null && !pics.isEmpty()) {
+//            List<MultipartFile> Hpic = pics.get("HouseHeadPic");
+//            List<MultipartFile> housePics = pics.get("HousePic");
+//            List<String> picUrl = new ArrayList<>();
+//            List<String> picUrlPublicId = new ArrayList<>();
+//            if (Hpic!=null) {
+//
+//                Hpic.forEach(r -> {
+//                    Map map1 = null;
+//                    try {
+//                        map1 = this.cloudinaryImageService.upload(r);
+//                    } catch (IOException ex) {
+//                        throw new RuntimeException(ex);
+//                    }
+//                    String url = (String) map1.get("url");
+//                    String picPublicID = (String) map1.get("public_id");
+//                    picUrl.add(url);
+//                    picUrlPublicId.add(picPublicID);
+//                });
+//                if (!(picUrl.isEmpty() && picUrlPublicId.isEmpty())) {
+//                    newHouse.setHouseHPic(picUrl.get(0));
+//                    newHouse.setHouseHPicPublicID(picUrlPublicId.get(0));
+//                }
+//            }
+//            if (housePics != null) {
+//                picUrl.clear();
+//                picUrlPublicId.clear();
+//                housePics.forEach(r -> {
+//                    Map map1 = null;
+//                    try {
+//                        map1 = this.cloudinaryImageService.upload(r);
+//                    } catch (IOException ex) {
+//                        throw new RuntimeException(ex);
+//                    }
+//                    String url = (String) map1.get("url");
+//                    String picPublicID = (String) map1.get("public_id");
+//                    picUrl.add(url);
+//                    picUrlPublicId.add(picPublicID);
+//                });
+//                if (!(picUrl.isEmpty() && picUrlPublicId.isEmpty())) {
+//                    newHouse.setPics(picUrl);
+//                    newHouse.setPicsPublicID(picUrlPublicId);
+//                }
+//            }
+//        }
+//        AtomicInteger invalidRoom = new AtomicInteger();
+//     House finalHouse =   houseRepository.save(newHouse);
+//        if (rooms != null && !rooms.isEmpty()) {
+//
+//           rooms.stream().forEach(e->{
+//               RoomDto room = gson.fromJson(e , RoomDto.class);
+//               Room existRoom = roomRepository.findRoomByRoomNumber(room.getRoomNumber());
+//               if(existRoom != null){
+//                   invalidRoom.getAndIncrement();
+//               }
+//               Room newRoom = new Room();
+//               newRoom.setRoomNumber(room.getRoomNumber());
+//               newRoom.setDescription(room.getDescription());
+//               newRoom.setRentPrice(room.getRentPrice());
+//               newRoom.setHouseName(newHouse.getHouseName());
+//
+//               if (pics != null && !pics.isEmpty()) {
+//                   List<MultipartFile> Hpic = pics.get("RH" + room.getRoomNumber());
+//                   List<MultipartFile> roomPics = pics.get("R" + room.getRoomNumber());
+//                   List<String> picUrl = new ArrayList<>();
+//                   List<String> picUrlPublicId = new ArrayList<>();
+//                   if (Hpic!=null) {
+//
+//                       Hpic.forEach(r -> {
+//                           Map map1 = null;
+//                           try {
+//                               map1 = this.cloudinaryImageService.upload(r);
+//                           } catch (IOException ex) {
+//                               throw new RuntimeException(ex);
+//                           }
+//                           String url = (String) map1.get("url");
+//                           String picPublicID = (String) map1.get("public_id");
+//                           picUrl.add(url);
+//                           picUrlPublicId.add(picPublicID);
+//                       });
+//                       if (!(picUrl.isEmpty() && picUrlPublicId.isEmpty())) {
+//                           newRoom.setRoomHPic(picUrl.get(0));
+//                           newRoom.setRoomHPicpublicID(picUrlPublicId.get(0));
+//                       }
+//                   }
+//                   if (roomPics != null) {
+//                       picUrl.clear();
+//                       picUrlPublicId.clear();
+//                       roomPics.forEach(r -> {
+//                           Map map1 = null;
+//                           try {
+//                               map1 = this.cloudinaryImageService.upload(r);
+//                           } catch (IOException ex) {
+//                               throw new RuntimeException(ex);
+//                           }
+//                           String url = (String) map1.get("url");
+//                           String picPublicID = (String) map1.get("public_id");
+//                           picUrl.add(url);
+//                           picUrlPublicId.add(picPublicID);
+//                       });
+//                   if (!(picUrl.isEmpty() && picUrlPublicId.isEmpty())) {
+//                       newRoom.setRoomPics(picUrl);
+//                       newRoom.setRoomPicsPublicID(picUrlPublicId);
+//                   }
+//                   }
+//               }
+//               newRoom.setHouse(finalHouse);
+//               roomList.add(newRoom);
+//           });
+//        } else {
+//            System.out.println("No rooms provided.");
+//        }
+//
+//
+//       List<Room> newRooms = roomRepository.saveAll(roomList);
+//
+//        if(invalidRoom.get()>0){
+//            return "House are added Successfully But some rooms are remove because room number is alread exist ";
+//        }
+//        return "Upload successful!";
+//    }
+//
+//    @GetMapping("/getAllRooms")
+//    public List<House> getAllhouse(){
+//        return houseRepository.findAll();
+//    }
 }
