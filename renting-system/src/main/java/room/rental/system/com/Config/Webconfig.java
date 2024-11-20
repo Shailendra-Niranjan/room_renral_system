@@ -1,13 +1,8 @@
 package room.rental.system.com.Config;
 
-import com.cloudinary.Cloudinary;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 public class Webconfig implements  WebMvcConfigurer {
@@ -20,17 +15,4 @@ public class Webconfig implements  WebMvcConfigurer {
                 .allowedHeaders("*") // Allow all headers
                 .allowCredentials(true); // Allow cookies and credentials
     }
-
-    @Bean
-    public Cloudinary  getCloudinary(){
-        Map map = new HashMap<>();
-        map.put("cloud_name" ,"dzu0bryd5");
-        map.put("api_key" ,"771298759177374");
-        map.put("api_secret" ,"sjMb-6KZRPGB9jf8pvGCT0yOX0Q");
-        map.put("secure" , true);
-
-        return new Cloudinary(map);
-
-    }
-
 }
