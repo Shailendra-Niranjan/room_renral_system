@@ -8,6 +8,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import room.rental.system.com.Dto.HouseDto;
 import room.rental.system.com.Dto.RoomDto;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@RestController
 public class HouseController {
 
     @Autowired
@@ -55,7 +57,7 @@ public class HouseController {
     }
 
     @GetMapping("/getAllHouse")
-    public List<House> getAllhouse(@RequestParam String status){
+    public List<House> getAllhouse(@RequestParam(required = false) String status){
         if(status!=null){
             if(status.equalsIgnoreCase("RemainRoom")){
                 return houseRepository.findHousesWithRoomsLessThanBookedRoom();

@@ -12,5 +12,7 @@ public interface RoomRepository extends JpaRepository<Room , UUID> {
     @Query("SELECT r FROM Room r WHERE r.roomNumber = :roomNumber AND r.houseName = :houseName")
     Room findRoomByRoomNumberAndHouseName(@Param("roomNumber") String roomNumber, @Param("houseName") String houseName);
 
-    List<Room> findRoomByAvailabilityStatus(boolean isbooked);
+    @Query("SELECT r FROM Room r WHERE r.availabilityStatus = :isBooked")
+    List<Room> findRoomByAvailabilityStatus(@Param("isBooked") boolean isBooked);
+
 }
