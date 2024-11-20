@@ -37,7 +37,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("auth/login", "auth/register" , "auth/forget-password" ,"/test").permitAll()
+                        .requestMatchers("auth/login", "auth/register" , "auth/forget-password" ,"/test" , "/upload/house").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(JwtFilter() , UsernamePasswordAuthenticationFilter.class)
